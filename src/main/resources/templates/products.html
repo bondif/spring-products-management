@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<title>Products Management</title>
+		<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" type="text/css" />
+	</head>
+	<body>
+		<div class="container">
+			<h1>Products Management</h1>
+			
+			<div class="row">
+				<div class="col-md-10">
+					<form action="/" class="form-inline mb-4">
+						<div class="form-group mr-4">
+							<input type="search" name="query" class="form-control">
+						</div>
+						<button type="submit" class="btn btn-primary">Search</button>
+					</form>
+				</div>
+				<div class="col-md-2">
+					<a href="/create" class="btn btn-success">New</a>
+				</div>
+			</div>
+			
+			<table class="table">
+			  <thead>
+			    <tr>
+			      <th>#</th>
+			      <th>Designation</th>
+			      <th>Price</th>
+			      <th>Actions</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+			    <tr th:each="p : ${products}">
+			      <th th:text="${p.id}"></th>
+			      <td th:text="${p.designation}"></td>
+			      <td th:text="${p.price}"></td>
+			      <td>
+					<a th:href="'/edit/' + ${p.id}" class="btn btn-warning">Edit</a>
+					<form th:action="@{/destroy/} + ${p.id}" method="post" class="d-inline">
+						<button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+					</form>
+			      </td>
+			    </tr>
+			  </tbody>
+			</table>
+		</div>
+	</body>
+</html>
