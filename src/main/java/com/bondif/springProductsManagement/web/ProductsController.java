@@ -2,9 +2,12 @@ package com.bondif.springProductsManagement.web;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +22,7 @@ public class ProductsController {
 	@Autowired
 	private ProductRepository productRepository;
 	
-	@GetMapping("/")
+	@GetMapping("/admin")
 	public String index(Model model,
 			@RequestParam(name="query", defaultValue="") String query) {
 		List<Product> products;
@@ -30,26 +33,27 @@ public class ProductsController {
 			products = productRepository.findByDesignationContaining(query);
 		
 		model.addAttribute("products", products);
+		model.addAttribute("query", query);
 		
 		return "products";
 	}
 	
-	@GetMapping("/create")
-	public String create() {
+	@GetMapping("/admin/create")
+	public String create(Model model) {
+		model.addAttribute("p", new Product());
 		return "create";
 	}
 	
-	@PostMapping("/store")
-	public ModelAndView store(Model model, 
-			@RequestParam(name="designation") String designation,
-			@RequestParam(name="price") double price) {
+	@PostMapping("/admin/store")
+	public String store(Model model, Product product, BindingResult bindingResult) {	
+		if(bindingResult.hasErrors()) return "redirect:/admin/create";
 		
-		productRepository.save(new Product(0, designation, price));
+		productRepository.save(product);
 		
-		return new ModelAndView("redirect:/");
+		return "redirect:/admin/";
 	}
 	
-	@GetMapping("/edit/{id}")
+	@GetMapping("/admin/edit/{id}")
 	public String edit(Model model, 
 			@PathVariable(name="id") long id) {
 
@@ -59,7 +63,7 @@ public class ProductsController {
 		return "edit";
 	}
 
-	@PostMapping("/update/{id}")
+	@PostMapping("/admin/update/{id}")
 	public ModelAndView update(@PathVariable(name="id") long id,
 			@RequestParam(name="designation") String designation,
 			@RequestParam(name="price") double price) {
@@ -70,16 +74,16 @@ public class ProductsController {
 		
 		productRepository.save(product);
 		
-		return new ModelAndView("redirect:/");
+		return new ModelAndView("redirect:/admin/");
 	}
 
-	@PostMapping("/destroy/{id}")
+	@PostMapping("/admin/destroy/{id}")
 	public ModelAndView destroy(@PathVariable(name="id") long id) {
 		
 		Product product = productRepository.getOne(id);
 		productRepository.delete(product);
 		
-		return new ModelAndView("redirect:/");
+		return new ModelAndView("redirect:/admin/");
 	}
 	
 }
